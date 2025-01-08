@@ -1,0 +1,8 @@
+name: Hermes
+version: '${project.version}'
+main: xyz.saturnvolv.hermes.Hermes
+api-version: '1.21.4'
+authors: [saturn-volv]
+description: A chat message handler for paper. Built for MythosCraft. [EMOJIS REQUIRE A COMPATIBLE RESOURCE PACK]
+softdepend: ["PlaceholderAPI", "LuckPerms"]
+
