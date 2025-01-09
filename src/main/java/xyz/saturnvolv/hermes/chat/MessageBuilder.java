@@ -15,7 +15,8 @@ public class MessageBuilder {
         Component prefix = LegacyComponentSerializer.legacyAmpersand().deserialize(PREFIX).replaceText(
                 TextReplacementConfig.builder()
                     .matchLiteral("%s")
-                    .replacement(user.displayName()).build());
+                    .replacement(user.displayName()).build()
+        );
         return Component.textOfChildren(prefix, TweMojiImpl.parseTweMoji(filterLanguage(message)));
     }
 

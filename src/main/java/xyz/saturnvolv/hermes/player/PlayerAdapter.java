@@ -7,11 +7,11 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import xyz.saturnvolv.hermes.Hermes;
+import xyz.saturnvolv.hermes.chat.MessageBadge;
 import xyz.saturnvolv.hermes.compat.luckperms.LuckPermsAPI;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -29,6 +29,7 @@ public class PlayerAdapter {
 
     private final UUID uuid;
     private String nickname;
+    private List<MessageBadge> badges;
 
     protected PlayerAdapter(UUID uuid) {
         this.uuid = uuid;
@@ -36,6 +37,7 @@ public class PlayerAdapter {
         Document playerData = getPlayerData(this.uuid);
         if (playerData != null) {
             this.nickname = ((String) playerData.get("nickname"));
+            this.badges = ((String) playerData.getOrDefault("badges", "")).chars().mapToObj(c -> (char) c).map(MessageBadge::fromUnicode).collect(Collectors.toList());
         }
         PLAYER_DATA_CACHE.put(uuid, this);
         updatePlayer();
@@ -50,6 +52,22 @@ public class PlayerAdapter {
         if (getPlayerData(this.uuid) == null) MythosDB.getCollection("hermes-player-data").insertOne(this.serialize());
         else MythosDB.getCollection("hermes-player-data").findOneAndReplace(eq("uuid", this.uuid.toString()), this.serialize());
         Hermes.logger().info(String.format("Saved player data for player: %s", Bukkit.getOfflinePlayer(this.uuid).getName() + "(" + this.uuid + ")."));
+    }
+
+
+    public void addBadge(char unicode) {
+        removeBadges(unicode);
+        this.badges.add(MessageBadge.fromUnicode(unicode, true));
+    }
+    public void addBadge(MessageBadge badge) {
+        removeBadges(badge.unicode());
+        this.badges.add(badge);
+    }
+    public List<MessageBadge> getBadges() {
+        return this.badges;
+    }
+    public void removeBadges(char unicode) {
+        this.badges.removeIf(badge -> badge.unicode() == unicode);
     }
 
     public Player getPlayer() {
@@ -99,16 +117,25 @@ public class PlayerAdapter {
 
     public Component displayName() {
         return Component.textOfChildren(
-                getGroupDisplayName(),
+                getGroupDisplayName()
+
+        ).append(Component.textOfChildren(
+                getBadges().stream()
+                        .map(MessageBadge::asComponent)
+                        .toArray(Component[]::new))
+        ).append(Component.textOfChildren(
                 getPrefix(),
                 serializeNickname(),
-                getSuffix()
+                getSuffix())
         );
     }
 
     public Document serialize() {
         Document document = new Document("uuid", this.uuid.toString());
         document.put("nickname", this.nickname);
+        StringBuilder builder = new StringBuilder();
+        this.badges.stream().map(MessageBadge::unicode).forEach(builder::append);
+        document.put("badges", builder.toString());
         return document;
     }
 }

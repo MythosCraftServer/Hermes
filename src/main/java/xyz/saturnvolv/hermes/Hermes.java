@@ -2,8 +2,10 @@ package xyz.saturnvolv.hermes;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -12,6 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import xyz.saturnvolv.hermes.chat.MessageBadge;
 import xyz.saturnvolv.hermes.chat.MessageBuilder;
 import xyz.saturnvolv.hermes.commands.HermesCommands;
 import xyz.saturnvolv.hermes.compat.placeholder_api.HermesExpansion;
@@ -26,6 +29,10 @@ public final class Hermes extends JavaPlugin implements Listener {
     private static final Logger LOGGER = Logger.getLogger("Hermes");
     private static Hermes INSTANCE;
     private static List<Pattern> FILTERED_PATTERNS;
+
+    public static final MessageBadge DONATOR = MessageBadge.builder('\uE104')
+            .showOnHover(Component.empty().append(Component.text("Donated to us at: ").style(Style.style(TextColor.fromHexString("#AAAAAA")))).append(Component.text("store.mythosmc.com").style(Style.style(TextColor.fromHexString("#00FFFF"), TextDecoration.UNDERLINED))))
+            .actionOnClick(ClickEvent.openUrl("https://store.mythosmc.com")).build();
 
     @Override
     public @NotNull Logger getLogger() {
