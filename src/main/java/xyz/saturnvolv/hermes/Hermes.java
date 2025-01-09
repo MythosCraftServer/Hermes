@@ -71,6 +71,7 @@ public final class Hermes extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         PlayerAdapter user = PlayerAdapter.of(event.getPlayer());
         user.updatePlayer(); // Just updates the player from the DB
+        user.addBadge(DONATOR);
 
         event.joinMessage(Component.empty()
                 .append(user.serializeNickname())
